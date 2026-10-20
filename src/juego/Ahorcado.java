@@ -5,94 +5,103 @@ import java.util.Scanner;
 
 public class Ahorcado {
 
-		// TODO Esbozo de método generado automáticamente
-		
-		private static final String[] PALABRAS = {
-		        "programacion", "java", "ordenador", "teclado", "variable",
-		        "git", "algoritmo", "servidor", "compilador", "bucle"
-		    };
-		    private static final int MAX_FALLOS = 6;
+    private static final String[] LISTA_PALABRAS = {
+        "programacion", "java", "ordenador", "teclado", "variable",
+        "git", "algoritmo", "servidor", "compilador", "bucle"
+    };
 
-		    public static void main(String[] args) {
-		        Scanner sc = new Scanner(System.in);
-		        Random random = new Random();
-		        boolean seguirJugando = true;
+    private static final int LIMITE_ERRORES = 6;
 
-		        System.out.println("=== JUEGO DEL AHORCADO ===");
+    public static void main(String[] argumentos) {
+        Scanner teclado = new Scanner(System.in);
+        Random generador = new Random();
+        boolean continuarPartida = true;
 
-		        while (seguirJugando) {
-		            String palabra = PALABRAS[random.nextInt(PALABRAS.length)];
-		            jugarRonda(palabra, sc);
+        System.out.println("=== JUEGO DEL AHORCADO ===");
 
-		            System.out.print("¿Quieres jugar otra vez? (s/n): ");
-		            String respuesta = sc.nextLine().trim().toLowerCase();
-		            seguirJugando = respuesta.equals("s");
-		        }
+        while (continuarPartida) {
+            String palabraSecreta =
+                LISTA_PALABRAS[generador.nextInt(LISTA_PALABRAS.length)];
 
-		        System.out.println("¡Hasta la próxima!");
-		        sc.close();
-		    }
+            iniciarPartida(palabraSecreta, teclado);
 
-		    private static void jugarRonda(String palabra, Scanner sc) {
-		        StringBuilder oculta = new StringBuilder("_".repeat(palabra.length()));
-		        StringBuilder letrasUsadas = new StringBuilder();
-		        int fallos = 0;
+            System.out.print("¿Quieres jugar otra vez? (s/n): ");
+            String opcion = teclado.nextLine().trim().toLowerCase();
+            continuarPartida = opcion.equals("s");
+        }
 
-		        while (fallos < MAX_FALLOS && oculta.indexOf("_") != -1) {
-		            System.out.println("\n" + dibujo(fallos));
-		            System.out.println("Palabra: " + oculta.toString().replace("", " ").trim());
-		            System.out.println("Letras usadas: " + letrasUsadas);
-		            System.out.print("Introduce una letra: ");
+        System.out.println("¡Hasta la próxima!");
+        teclado.close();
+    }
 
-		            String entrada = sc.nextLine().trim().toLowerCase();
+    private static void iniciarPartida(String palabraSecreta, Scanner teclado) {
+        StringBuilder palabraOculta =
+            new StringBuilder("_".repeat(palabraSecreta.length()));
 
-		            if (entrada.length() != 1 || !Character.isLetter(entrada.charAt(0))) {
-		                System.out.println("Introduce una sola letra.");
-		                continue;
-		            }
+        StringBuilder letrasIntentadas = new StringBuilder();
+        int errores = 0;
 
-		            char letra = entrada.charAt(0);
+        while (errores < LIMITE_ERRORES && palabraOculta.indexOf("_") != -1) {
+            System.out.println("\n" + obtenerDibujo(errores));
+            System.out.println(
+                "Palabra: " + palabraOculta.toString().replace("", " ").trim()
+            );
+            System.out.println("Letras usadas: " + letrasIntentadas);
+            System.out.print("Introduce una letra: ");
 
-		            if (letrasUsadas.indexOf(String.valueOf(letra)) != -1) {
-		                System.out.println("Ya has usado esa letra.");
-		                continue;
-		            }
+            String textoIntroducido = teclado.nextLine().trim().toLowerCase();
 
-		            letrasUsadas.append(letra).append(" ");
+            if (textoIntroducido.length() != 1
+                    || !Character.isLetter(textoIntroducido.charAt(0))) {
+                System.out.println("Introduce una sola letra.");
+                continue;
+            }
 
-		            if (palabra.indexOf(letra) != -1) {
-		                for (int i = 0; i < palabra.length(); i++) {
-		                    if (palabra.charAt(i) == letra) {
-		                        oculta.setCharAt(i, letra);
-		                    }
-		                }
-		                System.out.println("¡Bien! La letra está en la palabra.");
-		            } else {
-		                fallos++;
-		                System.out.println("La letra no está. Fallos: " + fallos + "/" + MAX_FALLOS);
-		            }
-		        }
+            char letraElegida = textoIntroducido.charAt(0);
 
-		        System.out.println("\n" + dibujo(fallos));
-		        if (oculta.indexOf("_") == -1) {
-		            System.out.println("¡Enhorabuena! Has adivinado: " + palabra);
-		        } else {
-		            System.out.println("Has perdido. La palabra era: " + palabra);
-		        }
-		    }
+            if (letrasIntentadas.indexOf(String.valueOf(letraElegida)) != -1) {
+                System.out.println("Ya has usado esa letra.");
+                continue;
+            }
 
-		    private static String dibujo(int fallos) {
-		        String[] dibujos = {
-		            "  +---+\n  |   |\n      |\n      |\n      |\n      |\n=========",
-		            "  +---+\n  |   |\n  O   |\n      |\n      |\n      |\n=========",
-		            "  +---+\n  |   |\n  O   |\n  |   |\n      |\n      |\n=========",
-		            "  +---+\n  |   |\n  O   |\n /|   |\n      |\n      |\n=========",
-		            "  +---+\n  |   |\n  O   |\n /|\\  |\n      |\n      |\n=========",
-		            "  +---+\n  |   |\n  O   |\n /|\\  |\n /    |\n      |\n=========",
-		            "  +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n========="
-		        };
-		        return dibujos[fallos];
+            letrasIntentadas.append(letraElegida).append(" ");
 
-	}
+            if (palabraSecreta.indexOf(letraElegida) != -1) {
+                for (int posicion = 0; posicion < palabraSecreta.length(); posicion++) {
+                    if (palabraSecreta.charAt(posicion) == letraElegida) {
+                        palabraOculta.setCharAt(posicion, letraElegida);
+                    }
+                }
 
+                System.out.println("¡Bien! La letra está en la palabra.");
+            } else {
+                errores++;
+                System.out.println(
+                    "La letra no está. Fallos: " + errores + "/" + LIMITE_ERRORES
+                );
+            }
+        }
+
+        System.out.println("\n" + obtenerDibujo(errores));
+
+        if (palabraOculta.indexOf("_") == -1) {
+            System.out.println("¡Enhorabuena! Has adivinado: " + palabraSecreta);
+        } else {
+            System.out.println("Has perdido. La palabra era: " + palabraSecreta);
+        }
+    }
+
+    private static String obtenerDibujo(int errores) {
+        String[] etapasAhorcado = {
+            "  +---+\n  |   |\n      |\n      |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n      |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n  |   |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n /|   |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n /|\\  |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n /|\\  |\n /    |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n========="
+        };
+
+        return etapasAhorcado[errores];
+    }
 }
