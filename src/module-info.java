@@ -5,4 +5,5 @@
  * 
  */
 module JuegoAhorcado {
+    exports juego;
 }
